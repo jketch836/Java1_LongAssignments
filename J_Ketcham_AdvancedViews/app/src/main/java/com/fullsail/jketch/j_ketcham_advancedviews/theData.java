@@ -21,22 +21,26 @@ public class theData extends BaseAdapter {
     private ArrayList<PersonInfo> anObject;
 
     public theData(Context c, ArrayList<PersonInfo> objects) {
+
         context = c;
         anObject = objects;
     }
 
     @Override
     public int getCount() {
+
         return anObject.size();
     }
 
     @Override
     public PersonInfo getItem(int position) {
+
         return anObject.get(position);
     }
 
     @Override
     public long getItemId(int position) {
+
         return ID_CONSTANT + position;
     }
 
@@ -52,12 +56,6 @@ public class theData extends BaseAdapter {
 
         TextView textV = (TextView) convertView.findViewById(R.id.nameText);
         textV.setText(info.name);
-
-        textV = (TextView) convertView.findViewById(R.id.somethingText);
-        textV.setText(info.something);
-
-        textV = (TextView) convertView.findViewById(R.id.ageText);
-        textV.setText("Age: " + info.age);
 
         return convertView;
     }

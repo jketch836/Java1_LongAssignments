@@ -5,12 +5,18 @@ package com.fullsail.jketch.j_ketcham_advancedviews;
  */
 public class PersonInfo {
 
+    public String relation;
     public String name;
     public String something;
-    public int age;
+    public Integer age;
 
-    public PersonInfo(String personName, String enterSomething, int personAge) {
+    public PersonInfo(String related, String personName, String enterSomething, Integer personAge) {
 
+//        int personAge = age;
+//        String personName = name;
+//        String enterSomething = something;
+
+        relation = related;
         name = personName;
         something = enterSomething;
         age = personAge;
