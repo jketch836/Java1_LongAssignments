@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".JKetcham_AdvancedViews"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:orientation="vertical">
 
 
     <Spinner
@@ -19,19 +20,23 @@
         android:visibility="gone"/>
 
 
-    <TextView android:id="@+id/nameTextview"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="24sp"/>
+        <TextView
+            android:id="@+id/nameTextview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp" />
 
-    <TextView android:id="@+id/professionTextview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"/>
+        <TextView
+            android:id="@+id/professionTextview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp" />
 
-    <TextView android:id="@+id/ageTextview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"/>
+        <TextView
+            android:id="@+id/ageTextview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp" />
+
 
 </LinearLayout>

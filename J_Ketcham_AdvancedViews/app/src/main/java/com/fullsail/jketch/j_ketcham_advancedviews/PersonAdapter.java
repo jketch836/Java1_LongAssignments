@@ -12,15 +12,15 @@ import java.util.ArrayList;
 /**
  * Created by jketch on 8/15/14.
  */
-public class theData extends BaseAdapter {
+public class PersonAdapter extends BaseAdapter {
 
 
-    private static final long ID_CONSTANT = 0x011111111;
+    private static final long CONSTANT_ID = 0x011111111;
 
     private Context context;
     private ArrayList<PersonInfo> anObject;
 
-    public theData(Context c, ArrayList<PersonInfo> objects) {
+    public PersonAdapter(Context c, ArrayList<PersonInfo> objects) {
 
         context = c;
         anObject = objects;
@@ -41,7 +41,7 @@ public class theData extends BaseAdapter {
     @Override
     public long getItemId(int position) {
 
-        return ID_CONSTANT + position;
+        return CONSTANT_ID + position;
     }
 
     @Override
@@ -56,6 +56,9 @@ public class theData extends BaseAdapter {
 
         TextView textV = (TextView) convertView.findViewById(R.id.nameText);
         textV.setText(info.name);
+
+       TextView profession = (TextView) convertView.findViewById(R.id.professionText);
+        profession.setText(info.profession);
 
         return convertView;
     }
