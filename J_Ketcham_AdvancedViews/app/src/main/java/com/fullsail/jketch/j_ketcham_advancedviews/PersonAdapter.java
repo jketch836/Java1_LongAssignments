@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 public class PersonAdapter extends BaseAdapter {
 
 
-    private static final long CONSTANT_ID = 0x011111111;
+    private static final long THE_CONSTANT_ID = 0x011111111;
 
     private Context context;
     private ArrayList<PersonInfo> anObject;
@@ -41,7 +42,7 @@ public class PersonAdapter extends BaseAdapter {
     @Override
     public long getItemId(int position) {
 
-        return CONSTANT_ID + position;
+        return THE_CONSTANT_ID + position;
     }
 
     @Override
@@ -52,13 +53,16 @@ public class PersonAdapter extends BaseAdapter {
                     R.layout.data_layout, parent, false);
         }
 
-        PersonInfo info = getItem(position);
+        PersonInfo data = getItem(position);
+
+        ImageView profilePic = (ImageView) convertView.findViewById(R.id.anImage);
+        profilePic.setImageResource(data.imageData);
 
         TextView textV = (TextView) convertView.findViewById(R.id.nameText);
-        textV.setText(info.name);
+        textV.setText(data.name);
 
-       TextView profession = (TextView) convertView.findViewById(R.id.professionText);
-        profession.setText(info.profession);
+       TextView profession = (TextView) convertView.findViewById(R.id.professionInfo);
+        profession.setText(data.profession);
 
         return convertView;
     }

@@ -7,17 +7,17 @@ public class PersonInfo {
 
     public String name;
     public String profession;
-    public Integer age;
+    public String relation;
+    public int age;
+    public int imageData;
 
-    public PersonInfo(String personName, String enterProfession, Integer personAge) {
-
-//        int personAge = age;
-//        String personName = name;
-//        String enterSomething = something;
+    public PersonInfo(String personName, String enterProfession, String related, int personAge, int imageSource) {
 
         name = personName;
         profession = enterProfession;
+        relation = related;
         age = personAge;
+        imageData = imageSource;
 
     }
 
