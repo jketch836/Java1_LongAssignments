@@ -5,4 +5,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <string name="Region">Region</string>
+    <string name="Server">Server</string>
+    <string name="GuildName">Guild Name</string>
+
+    <string name="RegionHint">us</string>
+    <string name="ServerHint">StormScale</string>
+    <string name="GuildNameHint">EightySixed</string>
+
+    <string name="ButtonName">Enter</string>
+
 </resources>
