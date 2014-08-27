@@ -51,27 +51,18 @@ public class WoWBaseAdapter extends BaseAdapter {
 
         WoWCustomClass toonData = (WoWCustomClass) getItem(position);
 
-        SmartImageView cover = (SmartImageView) convertView.findViewById(R.id.smartPicImage);
 
-//        if (server.manager.isWifiEnabled()) {
-//
-            cover.setImageUrl("http://us.battle.net/static-render/us" + toonData.toonPic);
-//
-//        } else {
-//
-//            cover.setImageResource(R.drawable.no_image);
-//
-//        }
-
+        SmartImageView profilPic = (SmartImageView) convertView.findViewById(R.id.smartImage);
+        profilPic.setImageUrl("http://us.battle.net/static-render/us/" + toonData.thumbnail);
 
         TextView toonName = (TextView) convertView.findViewById(R.id.toonNameText);
         toonName.setText(toonData.toonName);
 
-        TextView toonClass = (TextView) convertView.findViewById(R.id.toonClassText);
-        toonClass.setText(toonData.toonClass);
+        TextView toonClass = (TextView) convertView.findViewById(R.id.toonClassRLText);
+        toonClass.setText(toonData.toonClass + "    " + toonData.toonRace + "    " + toonData.toonLvL);
 
-        TextView toonLVL = (TextView) convertView.findViewById(R.id.toonLVLText);
-        toonLVL.setText("" + toonData.toonLvL);
+        TextView spec = (TextView) convertView.findViewById(R.id.specNameText);
+        spec.setText(toonData.toonSpecName + "    " + toonData.toonSpecRole);
 
         return convertView;
     }

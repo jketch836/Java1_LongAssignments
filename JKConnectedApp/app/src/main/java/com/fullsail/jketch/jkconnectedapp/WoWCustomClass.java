@@ -8,24 +8,26 @@ public class WoWCustomClass {
     String toonName;
     String toonClass;
     String toonRace;
+    String thumbnail;
     int toonLvL;
-    String toonPic;
     String toonSpecName;
     String toonSpecRole;
     String toonSpecDesc;
 
+    String Error;
+
     public WoWCustomClass(String name, String tClass, String race, int lvl, String pic,
-                          String specname, String specrole, String specdesc) {
+                          String specname, String specrole, String specdesc, String theError) {
 
         toonName = name;
         toonClass = tClass;
         toonRace = race;
+        thumbnail = pic;
         toonLvL = lvl;
-        toonPic = pic;
         toonSpecName = specname;
         toonSpecRole = specrole;
         toonSpecDesc = specdesc;
-
+        Error = theError;
     }
 
     @Override

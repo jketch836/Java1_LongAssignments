@@ -5,21 +5,19 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.GridView;
 import android.widget.Toast;
 
 import com.loopj.android.image.SmartImageView;
@@ -40,143 +38,52 @@ import java.util.ArrayList;
 public class MyActivity extends Activity {
 
     //UI Components
-    protected Spinner spinnerWoWView;
+    protected GridView gridWoWView;
 
-    protected ListView listWoWView;
-
-    public EditText serverText;
+    public EditText realmText;
 
     protected EditText guildNameText;
 
-    protected SmartImageView profileImage;
+    SmartImageView profilPic;
 
     WifiManager manager;
 
-    TextView charName;
-    TextView charClass;
-    TextView charRace;
-    TextView charLvL;
-    TextView charSpecName;
-    TextView charSpecRole;
-    TextView charSpecDesc;
     String aRace;
     String aClass;
 
-    int deviceOrientation;
-
     //Custom Class Components
     ArrayList<WoWCustomClass> WoWToonInfoArrayList = new ArrayList<WoWCustomClass>();
-    ArrayAdapter<WoWCustomClass> blizzardAdapter;
 
     WoWBaseAdapter WoWAdapter;
 
-    WoWAsyncTask blizzardTask = new WoWAsyncTask();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_my);
 
-        orientationCheck();
+        realmText = (EditText) findViewById(R.id.serverEdit);
+        realmText.setOnTouchListener(touchListener);
 
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        guildNameText = (EditText) findViewById(R.id.guildEdit);
+        guildNameText.setOnTouchListener(touchListener);
 
-    }
-
-    public void spinner () {
-
-        spinnerWoWView = (Spinner) findViewById(R.id.spinnerView);
-
-                /* Setting the Custom Adapter for the ListView */
-        spinnerWoWView.setOnItemSelectedListener(selectedItem);
-
-        findViewById(R.id.enterBTN).setOnClickListener(listener);
-
-        profileImage = (SmartImageView) findViewById(R.id.profilePic);
-        charName = (TextView) findViewById(R.id.nameText);
-        charClass = (TextView) findViewById(R.id.classText);
-        charRace = (TextView) findViewById(R.id.raceText);
-        charLvL = (TextView) findViewById(R.id.lvlText);
-        charSpecName = (TextView) findViewById(R.id.specNameText);
-        charSpecRole = (TextView) findViewById(R.id.specRoleText);
-        charSpecDesc = (TextView) findViewById(R.id.specDescText);
-
-        blizzardAdapter = new ArrayAdapter<WoWCustomClass>(this,
-                android.R.layout.simple_list_item_1, WoWToonInfoArrayList);
-
-        charName.setText("");
-        charClass.setText("");
-        charRace.setText("");
-        charLvL.setText("");
-        charSpecName.setText("");
-        charSpecRole.setText("");
-        charSpecDesc.setText("");
-        profileImage.setImageResource(R.drawable.no_image);
-
-        checkNetworkStatus();
-
-    }
-
-    public void listview () {
-
-        listWoWView = (ListView) findViewById(R.id.listView);
-
-                /* Setting the Custom Adapter for the ListView */
-        listWoWView.setOnItemClickListener(listItem);
-
-        findViewById(R.id.enterBTN).setOnClickListener(listener);
-
-        profileImage = (SmartImageView) findViewById(R.id.profilePic);
-        charName = (TextView) findViewById(R.id.nameText);
-        charClass = (TextView) findViewById(R.id.classText);
-        charRace = (TextView) findViewById(R.id.raceText);
-        charLvL = (TextView) findViewById(R.id.lvlText);
-        charSpecName = (TextView) findViewById(R.id.specNameText);
-        charSpecRole = (TextView) findViewById(R.id.specRoleText);
-        charSpecDesc = (TextView) findViewById(R.id.specDescText);
+        gridWoWView = (GridView) findViewById(R.id.gridView);
 
         WoWAdapter = new WoWBaseAdapter(this, WoWToonInfoArrayList);
 
-        charName.setText("");
-        charClass.setText("");
-        charRace.setText("");
-        charLvL.setText("");
-        charSpecName.setText("");
-        charSpecRole.setText("");
-        charSpecDesc.setText("");
-        profileImage.setImageResource(R.drawable.no_image);
+        /* Setting the Custom Adapter for the GridView */
+        gridWoWView.setAdapter(WoWAdapter);
+        gridWoWView.setOnItemClickListener(gridItem);
 
-        checkNetworkStatus();
+        profilPic = (SmartImageView) findViewById(R.id.smartImage);
 
-    }
+        findViewById(R.id.enterBTN).setOnClickListener(listener);
 
-    /* Orientation Check Method */
-    public void orientationCheck() {
-        //Getting the current screen orientation and then setting the orientation of app to that.
-        deviceOrientation = getResources().getConfiguration().orientation;
-        switch (deviceOrientation) {
-            case Configuration.ORIENTATION_PORTRAIT:
-//                setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-//            Log.e("", "ORIENTATION_PORTRAIT");
+        networkStatus checkNetwork = new networkStatus();
+        checkNetwork.checkNetworkStatus();
 
-                /* Setting the Content layout to portrait */
-                setContentView(R.layout.activity_my);
-
-                spinner();
-
-                break;
-            case Configuration.ORIENTATION_LANDSCAPE:
-//                setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
-//            Log.e("", "ORIENTATION_LANDSCAPE");
-
-                /* Setting the Content layout to landscape */
-                setContentView(R.layout.activity_my);
-
-                listview();
-
-                break;
-        }
-
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
 
@@ -184,13 +91,13 @@ public class MyActivity extends Activity {
 
         ProgressDialog progressDialog;
 
+        String reason;
+
         String name;
-        String pic;
+        String thumbnail;
         int theClass;
         int theRace;
         int theLvL;
-//        String aRace;
-//        String aClass;
 
         String specName;
         String specRole;
@@ -202,9 +109,10 @@ public class MyActivity extends Activity {
 
             progressDialog = new ProgressDialog(MyActivity.this);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            progressDialog.setIndeterminate(true);
-            progressDialog.getProgress();
+            progressDialog.setIndeterminate(false);
             progressDialog.show();
+
+            WoWToonInfoArrayList.clear();
 
         }
 
@@ -229,97 +137,113 @@ public class MyActivity extends Activity {
 
                 JSONObject jsonObject = new JSONObject(wowjsonString);
 
-                JSONArray wowJSON = jsonObject.getJSONArray("members");
+                String errorReason = jsonObject.getString("status");
 
-                for (int i = 0; i < wowJSON.length(); i++) {
+                Log.d("SOMETHING IMPORTANT:",""  + errorReason);
 
-                    JSONObject members = wowJSON.getJSONObject(i);
+                if (jsonObject.has("status")) {
 
-                    JSONObject characters = members.getJSONObject("character");
+                    if (jsonObject.getString("status").equals("nok")) {
 
-                    if (characters.has("name")) {
+                        reason = jsonObject.getString("reason");
 
-                        name = characters.getString("name");
+                        Log.d("THE REASON!!", reason);
 
-                    } else {
-
-                        name = "N/A";
 
                     }
 
-                    Log.d("TOON NAME", "The Toon Name: " + name);
+                } else {
+
+                    JSONArray wowJSON = jsonObject.getJSONArray("members");
+
+                    for (int i = 0; i < wowJSON.length(); i++) {
+
+                        progressDialog.setMax(wowJSON.length());
+                        Thread.sleep(50);
+                        publishProgress(i);
+
+                        JSONObject members = wowJSON.getJSONObject(i);
+
+                        JSONObject characters = members.getJSONObject("character");
+
+                        if (characters.has("name")) {
+
+                            name = characters.getString("name");
+
+                        } else {
+
+                            name = "Name: N/A";
+
+                        }
+
+//                    Log.d("TOON NAME", "The Toon Name: " + name);
 
                         theClass = characters.getInt("class");
 
                         classSwitch(theClass);
 
-                    Log.d("TOON CLASS", "The Toon Class: " + theClass);
+//                    Log.d("TOON CLASS", "The Toon Class: " + theClass);
 
                         theRace = characters.getInt("race");
 
                         raceSwitch(theRace);
 
-                    Log.d("TOON RACE", "The Toon Race: " + theRace);
+//                    Log.d("TOON RACE", "The Toon Race: " + theRace);
 
                         theLvL = characters.getInt("level");
 
-                    Log.d("TOON LVL", "The Toon lvl: " + theLvL);
+//                    Log.d("TOON LVL", "The Toon lvl: " + theLvL);
 
-                    if (characters.has("thumbnail")) {
 
-                        pic = characters.getString("thumbnail");
+                        thumbnail = characters.getString("thumbnail");
 
-                    } else {
+                        if (characters.has("spec")) {
 
-                        profileImage.setImageResource(R.drawable.ic_launcher);
+                            JSONObject spec = characters.getJSONObject("spec");
 
-                    }
+                            if (spec.has("name")) {
 
-                    Log.d("TOON IMAGE", "The Toon Image: " + pic);
+                                specName = spec.getString("name");
 
-                    if (characters.has("spec")) {
+                            } else {
 
-                        JSONObject spec = characters.getJSONObject("spec");
+                                specName = "Spec Name: N/A";
 
-                        if (spec.has("name")) {
+                            }
+                            if (spec.has("role")) {
 
-                            specName = spec.getString("name");
+                                specRole = spec.getString("role");
+
+                            } else {
+
+                                specRole = "Spec Role: N/A";
+
+                            }
+                            if (spec.has("description")) {
+
+                                specDesc = spec.getString("description");
+
+                            } else {
+
+                                specDesc = "Spec Desc: N/A";
+
+                            }
 
                         } else {
 
                             specName = "Spec Name: N/A";
 
-                        }
-                        if (spec.has("role")) {
-
-                            specRole = spec.getString("role");
-
-                        } else {
-
                             specRole = "Spec Role: N/A";
-
-                        }
-                        if (spec.has("description")) {
-
-                            specDesc = spec.getString("description");
-
-                        } else {
 
                             specDesc = "Spec Desc: N/A";
 
                         }
 
-                    } else {
+                        reason = "No Error";
 
-                        specName = "Spec Name: N/A";
-
-                        specRole = "Spec Role: N/A";
-
-                        specDesc = "Spec Desc: N/A";
+                        WoWToonInfoArrayList.add(new WoWCustomClass(name, aClass, aRace, theLvL, thumbnail, specName, specRole, specDesc, reason));
 
                     }
-
-                    WoWToonInfoArrayList.add(new WoWCustomClass(name, /* theClass, theRace, */ aClass, aRace, theLvL, pic, specName, specRole, specDesc));
 
                 }
 
@@ -335,6 +259,10 @@ public class MyActivity extends Activity {
 
                 e.printStackTrace();
 
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+
             }
 
             return null;
@@ -345,7 +273,7 @@ public class MyActivity extends Activity {
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
 
-            progressDialog.getProgress();
+            progressDialog.setProgress(values[0]);
 
         }
 
@@ -355,15 +283,26 @@ public class MyActivity extends Activity {
 
             progressDialog.dismiss();
 
-            if (deviceOrientation == Configuration.ORIENTATION_PORTRAIT) {
+//            if (reason.equals("Realm not Found") || reason.equals("Guild not Found")) {
+//
+//                AlertDialog.Builder theAlert = new AlertDialog.Builder(MyActivity.this);
+//                theAlert.setTitle("Error");
+//                theAlert.setMessage(reason);
+//                theAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                    }
+//                });
+//
+//                theAlert.show();
+//
+//            } else {
 
-                spinnerWoWView.setAdapter(blizzardAdapter);
+                gridWoWView.setAdapter(WoWAdapter);
 
-            } else {
+//            }
 
-                 listWoWView.setAdapter(WoWAdapter);
-
-            }
 
         }
 
@@ -465,126 +404,160 @@ public class MyActivity extends Activity {
     }
 
 
-    public void checkNetworkStatus() {
-
-        ConnectivityManager mgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (mgr != null) {
-
-            NetworkInfo info = mgr.getActiveNetworkInfo();
-
-            if (info != null) {
-                if (info.isConnected()) {
-
-                    Toast toast = Toast.makeText(MyActivity.this, "Internet Connection Established", Toast.LENGTH_SHORT);
-
-                    toast.show();
-
-                }
-            } else {
-
-                manager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-
-                if (!(manager.isWifiEnabled())) {
-
-                    AlertDialog.Builder theAlert = new AlertDialog.Builder(MyActivity.this);
-                    theAlert.setTitle("No Internet Connection");
-                    theAlert.setMessage("What do you want to Do?");
-                    theAlert.setNegativeButton("Leave Me Alone!!", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
-
-                    theAlert.setNeutralButton("Turn On Wifi", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            manageWifi(true);
-
-                        }
-                    });
-                    theAlert.show();
-
-                }
-            }
-        }
-    }
-
-
-    public void manageWifi(boolean toggle) {
-
-        manager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-
-        if (toggle && !(manager.isWifiEnabled())) {
-            manager.setWifiEnabled(true);
-
-            Toast toast = Toast.makeText(MyActivity.this, "Internet Connection Established", Toast.LENGTH_SHORT);
-
-            toast.show();
-
-            checkNetworkStatus();
-        }
-    }
-
-
     View.OnClickListener listener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
+            if (realmText.getText().length() > 5 && guildNameText.getText().length() > 5) {
 
-            blizzardTask.execute("http://us.battle.net/api/wow/guild/The%20Venture%20Co/The%20Grim%20Covenant?fields=members");
+                WoWAsyncTask blizzardTask = new WoWAsyncTask();
 
-//            if (serverText.getText().length() != 0 && guildNameText.getText().length() != 0) {
-//
-////                blizzardTask.execute("http://us.battle.net/api/wow/guild/" + serverText.getText() + "/" + guildNameText.getText() + "?fields=members");
-//
-//                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//
-//                inputManager.hideSoftInputFromWindow(serverText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-//                inputManager.hideSoftInputFromWindow(guildNameText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-//
-//            }
+                String realmString = realmText.getText().toString().replace(" ", "%20");
+
+                String guildString = guildNameText.getText().toString().replace(" ", "%20");
+
+                Log.d("REALM:", realmString);
+                Log.d("GUILD:", guildString);
+
+
+                String urlString = "http://us.battle.net/api/wow/guild/" + realmString + "/" + guildString + "?fields=members";
+
+//            String urlString = " http://us.battle.net/api/wow/guild/The%20Venture%20Co/The%20Grim%20Covenant?fields=members";
+
+                Log.d("COMBINED:", urlString);
+
+                blizzardTask.execute(urlString);
+
+                InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                inputManager.hideSoftInputFromWindow(realmText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                inputManager.hideSoftInputFromWindow(guildNameText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
+            } else {
+
+                AlertDialog.Builder theAlert = new AlertDialog.Builder(MyActivity.this);
+                theAlert.setTitle("Error");
+                theAlert.setMessage("Please Enter a Realm and Guild Name");
+                theAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                theAlert.show();
+
+            }
         }
     };
 
-    public void WoWData(int theItem) {
-        WoWCustomClass info = WoWToonInfoArrayList.get(theItem);
 
-        profileImage.setImageUrl("http://us.battle.net/static-render/us/" + info.toonPic);
-        charName.setText("" + info.toonName);
-        charClass.setText("" + info.toonClass);
-        charRace.setText("" + info.toonRace);
-        charLvL.setText("Level: " + info.toonLvL);
-        charSpecName.setText("" + info.toonSpecName);
-        charSpecRole.setText("" + info.toonSpecRole);
-        charSpecDesc.setText("" + info.toonSpecDesc);
-
-    }
-
-    AdapterView.OnItemSelectedListener selectedItem = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            WoWData(position);
-
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
-        }
-    };
-
-    /* ListView Item Click */
-    AdapterView.OnItemClickListener listItem = new AdapterView.OnItemClickListener() {
+    /* GridView Item Click */
+    AdapterView.OnItemClickListener gridItem = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 
-            WoWData(position);
+            WoWCustomClass info = WoWToonInfoArrayList.get(position);
+
+
+            AlertDialog.Builder theAlert = new AlertDialog.Builder(MyActivity.this);
+            theAlert.setTitle(info.toonName + "     " + info.toonSpecName);
+            theAlert.setMessage(info.toonSpecDesc);
+            theAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            theAlert.show();
 
         }
     };
 
+    View.OnTouchListener touchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+
+            if (v.getId() == R.id.serverEdit) {
+
+                realmText.setText("");
+
+            } else if (v.getId() == R.id.guildEdit) {
+
+                guildNameText.setText("");
+
+            }
+
+            return false;
+        }
+    };
+
+
+    protected class networkStatus {
+
+        public void checkNetworkStatus() {
+
+            ConnectivityManager mgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            if (mgr != null) {
+
+                NetworkInfo info = mgr.getActiveNetworkInfo();
+
+                if (info != null) {
+                    if (info.isConnected()) {
+
+                        Toast toast = Toast.makeText(MyActivity.this, "Internet Connection Established", Toast.LENGTH_SHORT);
+
+                        toast.show();
+
+                    }
+                } else {
+
+                    manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+                    if (!(manager.isWifiEnabled())) {
+
+                        AlertDialog.Builder theAlert = new AlertDialog.Builder(MyActivity.this);
+                        theAlert.setTitle("No Internet Connection");
+                        theAlert.setMessage("What do you want to Do?");
+                        theAlert.setNegativeButton("Nothing", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        });
+
+                        theAlert.setNeutralButton("Turn On Wifi", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                manageWifi(true);
+
+                            }
+                        });
+                        theAlert.show();
+
+                    }
+                }
+            }
+        }
+
+
+        public void manageWifi(boolean toggle) {
+
+            manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+            if (toggle && !(manager.isWifiEnabled())) {
+                manager.setWifiEnabled(true);
+
+                Toast toast = Toast.makeText(MyActivity.this, "Internet Connection Established", Toast.LENGTH_SHORT);
+
+                toast.show();
+
+                checkNetworkStatus();
+            }
+        }
+
+    }
 }
