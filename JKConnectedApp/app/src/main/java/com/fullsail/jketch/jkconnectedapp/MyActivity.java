@@ -50,6 +50,7 @@ public class MyActivity extends Activity {
 
     String aRace;
     String aClass;
+    String reason;
 
     //Custom Class Components
     ArrayList<WoWCustomClass> WoWToonInfoArrayList = new ArrayList<WoWCustomClass>();
@@ -91,7 +92,7 @@ public class MyActivity extends Activity {
 
         ProgressDialog progressDialog;
 
-        String reason;
+
 
         String name;
         String thumbnail;
@@ -108,8 +109,10 @@ public class MyActivity extends Activity {
             super.onPreExecute();
 
             progressDialog = new ProgressDialog(MyActivity.this);
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            progressDialog.setIndeterminate(false);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setTitle("Loading Guild Members");
+            progressDialog.setMessage("Please wait while the Guild Member information is loading");
             progressDialog.show();
 
             WoWToonInfoArrayList.clear();
@@ -137,30 +140,21 @@ public class MyActivity extends Activity {
 
                 JSONObject jsonObject = new JSONObject(wowjsonString);
 
-                String errorReason = jsonObject.getString("status");
-
-                Log.d("SOMETHING IMPORTANT:",""  + errorReason);
-
-                if (jsonObject.has("status")) {
-
-                    if (jsonObject.getString("status").equals("nok")) {
-
-                        reason = jsonObject.getString("reason");
-
-                        Log.d("THE REASON!!", reason);
-
-
-                    }
-
-                } else {
+//                String juildName = jsonObject.getString("name");
+//
+//                Log.d("THE REASON!!", juildName);
+//
+//                if (jsonObject.has("reason")) {
+//
+//                        reason = jsonObject.getString("reason");
+//
+//                        Log.d("THE REASON!!", reason);
+//
+//                } else {
 
                     JSONArray wowJSON = jsonObject.getJSONArray("members");
 
                     for (int i = 0; i < wowJSON.length(); i++) {
-
-                        progressDialog.setMax(wowJSON.length());
-                        Thread.sleep(50);
-                        publishProgress(i);
 
                         JSONObject members = wowJSON.getJSONObject(i);
 
@@ -243,7 +237,7 @@ public class MyActivity extends Activity {
 
                         WoWToonInfoArrayList.add(new WoWCustomClass(name, aClass, aRace, theLvL, thumbnail, specName, specRole, specDesc, reason));
 
-                    }
+//                    }
 
                 }
 
@@ -259,23 +253,12 @@ public class MyActivity extends Activity {
 
                 e.printStackTrace();
 
-            } catch (InterruptedException e) {
-
-                e.printStackTrace();
-
             }
 
             return null;
 
         }
 
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            progressDialog.setProgress(values[0]);
-
-        }
 
         @Override
         protected void onPostExecute(String s) {
@@ -283,25 +266,26 @@ public class MyActivity extends Activity {
 
             progressDialog.dismiss();
 
-//            if (reason.equals("Realm not Found") || reason.equals("Guild not Found")) {
-//
-//                AlertDialog.Builder theAlert = new AlertDialog.Builder(MyActivity.this);
-//                theAlert.setTitle("Error");
+            if (WoWToonInfoArrayList.size() == 0) {
+
+                AlertDialog.Builder theAlert = new AlertDialog.Builder(MyActivity.this);
+                theAlert.setTitle("Error");
+                theAlert.setMessage("Please check the Realm Name or Guild Name");
 //                theAlert.setMessage(reason);
-//                theAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//
-//                    }
-//                });
-//
-//                theAlert.show();
-//
-//            } else {
+                theAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                theAlert.show();
+
+            } else {
 
                 gridWoWView.setAdapter(WoWAdapter);
 
-//            }
+            }
 
 
         }
